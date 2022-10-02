@@ -3,11 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AwsController } from './controllers/aws/aws.controller';
 import { ConfigModule } from '@nestjs/config';
-import {
-  // utilities as nestWinstonModuleUtilities,
-  WinstonModule,
-} from 'nest-winston';
+import { WinstonModule } from 'nest-winston';
 import { format, transports } from 'winston';
+import { AwsService } from './services/aws/aws.service';
 import 'winston-daily-rotate-file';
 
 const applyFormat = format.combine(
@@ -19,9 +17,11 @@ const applyFormat = format.combine(
   format.printf((info) => {
     let afterMessage = ``;
     if (info.context !== undefined) {
-      afterMessage = JSON.stringify(info.context);
-    } else if (info.stack !== undefined) {
-      afterMessage = JSON.stringify(info.stack);
+      afterMessage += JSON.stringify(info.context);
+    }
+
+    if (info.stack !== undefined) {
+      afterMessage += JSON.stringify(info.stack, undefined, 2);
     }
 
     return ``
@@ -56,6 +56,6 @@ const applyFormat = format.combine(
     }),
   ],
   controllers: [AwsController, AppController],
-  providers: [AppService],
+  providers: [AppService, AwsService],
 })
 export class AppModule {}
